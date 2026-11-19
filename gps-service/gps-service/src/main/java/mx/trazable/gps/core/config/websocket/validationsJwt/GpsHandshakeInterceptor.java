@@ -41,14 +41,22 @@ public class GpsHandshakeInterceptor implements HandshakeInterceptor {
         String authorization =
                 httpRequest.getHeader("Authorization");
 
-        if (authorization == null) {
+        // Si no viene en el header, buscarlo como parámetro en la URL (para el navegador web)
+        if (authorization == null || authorization.isBlank()) {
+            String tokenParam = httpRequest.getParameter("token");
+            if (tokenParam != null && !tokenParam.isBlank()) {
+                authorization = tokenParam.trim(); // O "Bearer " + tokenParam según lo limpie tu validador
+            }
+        }
+
+        if (authorization == null || authorization.isBlank()) {
 
             response.setStatusCode(HttpStatus.UNAUTHORIZED);
             return false;
         }
 
         try {
-            String token = authorization.trim();
+            String token = authorization.replace("Bearer ", "").trim();
 
             GpsIdentity identity = tokenValidator.validate(token);
 
