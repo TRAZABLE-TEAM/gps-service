@@ -2,6 +2,7 @@ package mx.trazable.gps.service;
 
 import com.github.benmanes.caffeine.cache.Cache;
 import com.github.benmanes.caffeine.cache.Caffeine;
+import mx.trazable.gps.core.config.PlateUtils;
 import mx.trazable.gps.core.config.websocket.records.GpsQueuedPulse;
 import mx.trazable.gps.model.GpsPulseDTO;
 import org.springframework.stereotype.Service;
@@ -18,11 +19,11 @@ import java.util.concurrent.TimeUnit;
 
 /**
  * Filtra las coordenadas GPS por organización y placa.
- *
+ * <p>
  * Evita guardar ubicaciones repetidas o muy cercanas.
  * Conserva eventos importantes y actualiza la última
  * ubicación únicamente después de persistir en PostgreSQL.
- *
+ * <p>
  * Utiliza Caffeine para limitar el consumo de memoria.
  */
 @Service
@@ -149,13 +150,7 @@ public class GpsGeoFilterService {
      * Genera una clave única por organización y placa.
      */
     private String key(GpsQueuedPulse item) {
-
-        String plate = item.pulse()
-                .plate()
-                .trim()
-                .toUpperCase(Locale.ROOT);
-
-        return item.identity().orgId() + ":" + plate;
+        return item.identity().orgId() + ":" + PlateUtils.normalize(item.pulse().plate());
     }
 
     /**

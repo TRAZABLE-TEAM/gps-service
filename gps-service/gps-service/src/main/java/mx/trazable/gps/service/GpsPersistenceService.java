@@ -46,11 +46,7 @@ public class GpsPersistenceService {
             entity.setType(pulse.type());
             entity.setAppointmentId(pulse.appointmentId());
 
-            entity.setAdditionalData(
-                    pulse.additionalData() != null
-                            ? pulse.additionalData()
-                            : Map.of()
-            );
+            entity.setAdditionalData(pulse.additionalData() != null ? pulse.additionalData() : Map.of());
 
             entity.setCatCarrierId(identity.carrierId());
             entity.setCatSupplierGpsId(identity.supplierGpsId());
