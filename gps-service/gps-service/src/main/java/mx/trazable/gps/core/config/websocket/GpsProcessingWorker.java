@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import mx.trazable.gps.core.config.sse.GpsSseBroadcaster;
 import mx.trazable.gps.core.config.websocket.records.GpsQueuedPulse;
 import mx.trazable.gps.service.GpsGeoFilterService;
 import mx.trazable.gps.service.GpsPersistenceService;
@@ -37,6 +38,7 @@ public class GpsProcessingWorker {
     private final GpsIngestionService ingestionService;
     private final GpsPersistenceService persistenceService;
     private final GpsGeoFilterService geoFilterService;
+    private final GpsSseBroadcaster sseBroadcaster;
 
     private volatile boolean running = true;
     private Thread worker;
@@ -90,6 +92,9 @@ public class GpsProcessingWorker {
 
                     // Actualizar caché después del guardado exitoso.
                     geoFilterService.confirmBatch(filteredBatch);
+
+                    // NUEVO: Emitir en tiempo real al dasboard conectado via SSE
+                    sseBroadcaster.broadcast(filteredBatch);
                 }
 
                 log.info(

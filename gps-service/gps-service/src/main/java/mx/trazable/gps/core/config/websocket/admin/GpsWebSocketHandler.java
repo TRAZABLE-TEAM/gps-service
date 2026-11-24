@@ -66,7 +66,7 @@ public class GpsWebSocketHandler extends TextWebSocketHandler {
             return;
         }
 
-        session.setTextMessageSizeLimit(4096);
+        session.setTextMessageSizeLimit(65536);
 
         sessionManager.register(session.getId(), session);
 
